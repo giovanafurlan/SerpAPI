@@ -1,0 +1,60 @@
+<html>
+
+<head>
+    <title>Custódio</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <table id="tableCustodio"></table>
+</body>
+
+<script>
+    inicio();
+
+    function inicio() {
+
+        console.log("inicio da requisição");
+
+        var url =
+            "https://serpapi.com/search.json?q=webpeak&api_key=d707dfa608017f8efa6c6b7522c6a392d2b1e87e98cd5294edf9474b4ce302d4&location=State+of+Sao+Paulo%2C+Brazil&google_domain=google.com.br&hl=pt-br";
+
+        var tabela = document.getElementById("tableCustodio");
+
+        $.ajax({
+            url: url,
+            crossDomain: true,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+
+                console.log(data);
+
+                for (var i = 0; i < data.organic_results.length; i++) {
+
+                    var linhaData = data.organic_results[i];
+
+                    console.log(linhaData);
+
+                    if (i == 0) {
+                        var linha = tabela.insertRow(0);
+                    } else {
+                        var linha = tabela.insertRow();
+                    }
+
+                    var l = 0;
+                    var nome = linha.insertCell(l++);
+                    nome.innerHTML = linhaData.title;
+
+                    var link = linha.insertCell(l++);
+                    link.innerHTML = linhaData.link;
+
+                    var snippet = linha.insertCell(l++);
+                    snippet.innerHTML = linhaData.snippet;
+                }
+            }
+        });
+    }
+</script>
+
+</html>
