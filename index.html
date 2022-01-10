@@ -1,59 +1,175 @@
 <html>
 
 <head>
-    <title>Custódio</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Google Search</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+        integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </head>
 
 <body>
+    <nav class="search">
+        <input type="text" class="searchTerm" id="searchTerm">
+        <button class="searchButton" id="button" onClick="consulta()"><i class="fas fa-search"></i></button>
+    </nav>
+    <hr><br>
+    <h4>Resultados</h4>
     <table id="tableCustodio"></table>
 </body>
 
+<style>
+    * {
+        margin: 0 auto;
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    .search {
+        margin-top: 3vh;
+        float: left;
+        width: 100%;
+        height: 10vh;
+    }
+
+    .searchTerm {
+        width: 50vw;
+        height: 7vh;
+        border: 0.5px solid gray;
+        border-right: none;
+        padding: 5px;
+        border-radius: 20px;
+        outline: none;
+    }
+
+    .searchButton {
+        background: none;
+        border: none;
+        font-size: 1.5vw;
+        color: lightslategray;
+        cursor: pointer;
+    }
+
+    h4 {
+        color: gray;
+    }
+</style>
+
 <script>
-    inicio();
+    function limpar() {
+        $("#tableCustodio").remove();
+    }
 
-    function inicio() {
-
-        console.log("inicio da requisição");
-
-        var url =
-            "https://serpapi.com/search.json?q=webpeak&api_key=d707dfa608017f8efa6c6b7522c6a392d2b1e87e98cd5294edf9474b4ce302d4&location=State+of+Sao+Paulo%2C+Brazil&google_domain=google.com.br&hl=pt-br";
-
+    function consulta() {
         var tabela = document.getElementById("tableCustodio");
 
-        $.ajax({
-            url: url,
-            crossDomain: true,
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
+        var sea = document.getElementById("searchTerm");
 
-                console.log(data);
+        start(sea.value);
+    }
 
-                for (var i = 0; i < data.organic_results.length; i++) {
+    function start(consulta) {
 
-                    var linhaData = data.organic_results[i];
+        if ("#searchTerm" != " ") {
 
-                    console.log(linhaData);
+            console.log("Início da requisição");
 
-                    if (i == 0) {
-                        var linha = tabela.insertRow(0);
-                    } else {
-                        var linha = tabela.insertRow();
+            var url =
+                "https://serpapi.com/search.json?q=" + consulta +
+                "&api_key=d707dfa608017f8efa6c6b7522c6a392d2b1e87e98cd5294edf9474b4ce302d4&location=State+of+Sao+Paulo%2C+Brazil&google_domain=google.com.br&hl=pt-br";
+
+            var tabela = document.getElementById("tableCustodio");
+
+            $.ajax({
+                url: url,
+                crossDomain: true,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    /*
+                    console.log(data);
+
+                    console.log(data.knowledge_graph.title);
+
+                    console.log(data.knowledge_graph.posts.length);
+
+                    for(var i = 0; data.knowledge_graph.posts.length > i; i++){
+
+                        var obj = data.knowledge_graph.posts[i];
+
+                        console.log(i + " - " + obj.description);
                     }
+                    */
+                    //organic_results
+
+                    for (var i = 0; i < data.organic_results.length; i++) {
+                        var linhaData = data.organic_results[i];
+
+                        if (i == 0) {
+                            var linha = tabela.insertRow(0);
+                        } else {
+                            var linha = tabela.insertRow();
+                        }
+
+                        var l = 0;
+                        var nome = linha.insertCell(l++);
+                        nome.innerHTML = linhaData.title;
+
+                        var link = linha.insertCell(l++);
+                        link.innerHTML = linhaData.link;
+
+                        var snippet = linha.insertCell(l++);
+                        snippet.innerHTML = linhaData.snippet;
+                    }
+
+                    //related_searches
+
+                    for (var i = 0; i < data.related_searches.length; i++) {
+
+                        var linhaData = data.related_searches[i];
+
+                        if (i == 0) {
+                            var linha = tabela.insertRow(0);
+                        } else {
+                            var linha = tabela.insertRow();
+                        }
+
+                        var l = 0;
+                        var nome = linha.insertCell(l++);
+                        nome.innerHTML = linhaData.query;
+
+                        var link = linha.insertCell(l++);
+                        link.innerHTML = linhaData.link;
+                    }
+
+                    //knowledge_graph
+
+                    var linha = tabela.insertRow(0);
+                    var linhaData = data.knowledge_graph;
 
                     var l = 0;
                     var nome = linha.insertCell(l++);
                     nome.innerHTML = linhaData.title;
 
-                    var link = linha.insertCell(l++);
-                    link.innerHTML = linhaData.link;
+                    var tipo = linha.insertCell(l++);
+                    tipo.innerHTML = linhaData.type;
 
-                    var snippet = linha.insertCell(l++);
-                    snippet.innerHTML = linhaData.snippet;
+                    var link = linha.insertCell(l++);
+                    link.innerHTML = linhaData.website;
+
+                    //knowledge_graph.local_map
+
+                    var linha = tabela.insertRow(0);
+                    var linhaData = data.knowledge_graph.local_map;
+
+                    j = 0
+                    var local = linha.insertCell(j++);
+                    local.innerHTML = linhaData.image;
                 }
-            }
-        });
+
+            });
+        } else {
+            limpar()
+        }
     }
 </script>
 
